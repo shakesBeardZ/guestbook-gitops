@@ -62,13 +62,9 @@ jobs:
     
     # Add additional steps here like scanning of image
 
-    - name: push the image to Amazon ECR
-      id: push-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: 1.0
+    # Only push to registry on master
+    - name: Push
+      if: github.ref == 'refs/heads/master'
       run: |
-        echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$CONTAINER_IMAGE
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$CONTAINER_IMAGE"
+        # Push image to AWS ECR
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
